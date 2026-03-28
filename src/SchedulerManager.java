@@ -12,10 +12,17 @@ public class SchedulerManager {
         this.taskQueue = new PriorityQueue<>(Comparator.comparingDouble(Task::calculateDynamicPriority).reversed());
     }
 
-    public void addTask(Task t) throws InvalidTaskDataException {
+    public void addTask(Task t) throws InvalidTaskDataException, exceptions.DeadlineConflictException {
         if (t == null || t.getTaskId() == null || t.getTitle() == null || t.getDeadline() == null) {
             throw new InvalidTaskDataException("Task fields cannot be null.");
         }
+        
+        for (Task existing : taskQueue) {
+            if (existing.getDeadline().equals(t.getDeadline()) && existing.getTitle().equals(t.getTitle())) {
+                throw new exceptions.DeadlineConflictException("A task with the same title ('" + t.getTitle() + "') and deadline already exists.");
+            }
+        }
+        
         taskQueue.offer(t);
     }
 

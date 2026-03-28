@@ -20,7 +20,7 @@ public class Main {
                 scheduler.addTask(t);
             }
             System.out.println("Loaded " + loadedTasks.size() + " tasks from storage.");
-        } catch (IOException | InvalidTaskDataException e) {
+        } catch (IOException | InvalidTaskDataException | exceptions.DeadlineConflictException e) {
             System.out.println("Error loading tasks: " + e.getMessage());
         }
 
@@ -64,12 +64,20 @@ public class Main {
             String title = scanner.nextLine();
             System.out.print("Enter Deadline (YYYY-MM-DD): ");
             LocalDate deadline = LocalDate.parse(scanner.nextLine());
+            
+            if (deadline.isBefore(LocalDate.now())) {
+                System.out.println("Error: Deadline cannot be in the past.");
+                return;
+            }
+
             System.out.print("Enter Base Priority (1-10): ");
             double basePriority = Double.parseDouble(scanner.nextLine());
 
             OneTimeTask task = new OneTimeTask(id, title, deadline, basePriority);
             scheduler.addTask(task);
             System.out.println("One-time task added successfully.");
+        } catch (exceptions.DeadlineConflictException e) {
+            System.out.println("Conflict Error: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Error adding task: " + e.getMessage());
         }
@@ -83,6 +91,12 @@ public class Main {
             String title = scanner.nextLine();
             System.out.print("Enter Initial Deadline (YYYY-MM-DD): ");
             LocalDate deadline = LocalDate.parse(scanner.nextLine());
+            
+            if (deadline.isBefore(LocalDate.now())) {
+                System.out.println("Error: Deadline cannot be in the past.");
+                return;
+            }
+
             System.out.print("Enter Base Priority (1-10): ");
             double basePriority = Double.parseDouble(scanner.nextLine());
             System.out.print("Enter Recurring Interval in Days: ");
@@ -91,6 +105,8 @@ public class Main {
             RecurringTask task = new RecurringTask(id, title, deadline, basePriority, interval);
             scheduler.addTask(task);
             System.out.println("Recurring task added successfully.");
+        } catch (exceptions.DeadlineConflictException e) {
+            System.out.println("Conflict Error: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Error adding task: " + e.getMessage());
         }
