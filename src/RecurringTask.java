@@ -1,22 +1,28 @@
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * Inheritance: Extends the Task base class, adding recurring-specific logic.
+ */
 public class RecurringTask extends Task {
+    // Encapsulation: Private field to explicitly prevent external access.
     private int recurringIntervalDays;
 
+    /** Constructor initializes base properties and the specific interval field. */
     public RecurringTask(String taskId, String title, LocalDate deadline, double basePriority, int recurringIntervalDays) {
         super(taskId, title, deadline, basePriority);
         this.recurringIntervalDays = recurringIntervalDays;
     }
 
-    public int getRecurringIntervalDays() {
-        return recurringIntervalDays;
-    }
+    /** Encapsulation: Getter for specific attribute. */
+    public int getRecurringIntervalDays() { return recurringIntervalDays; }
+    /** Encapsulation: Setter for specific attribute. */
+    public void setRecurringIntervalDays(int recurringIntervalDays) { this.recurringIntervalDays = recurringIntervalDays; }
 
-    public void setRecurringIntervalDays(int recurringIntervalDays) {
-        this.recurringIntervalDays = recurringIntervalDays;
-    }
-
+    /**
+     * Polymorphism: Overrides the base logic to reset deadlines 
+     * in addition to calculating priority.
+     */
     @Override
     public double calculateDynamicPriority() {
         if (LocalDate.now().isAfter(deadline)) {

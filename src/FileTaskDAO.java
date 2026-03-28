@@ -3,23 +3,26 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Interface Implementation: Implements the TaskDAO abstraction for persistent file-based storage.
+ */
 public class FileTaskDAO implements TaskDAO {
+    // Encapsulation: Private immutable field.
     private final String filePath;
 
+    /** Constructor injecting the file path. */
     public FileTaskDAO(String filePath) {
         this.filePath = filePath;
     }
 
+    /** Polymorphism: Concrete implementation of saveTasks using basic File IO. */
     @Override
     public void saveTasks(List<Task> tasks) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Task t : tasks) {
-                // Determine task type
                 String type = t instanceof RecurringTask ? "RECURRING" : "ONETIME";
-                
                 writer.write(type + "," + t.getTaskId() + "," + t.getTitle() + "," + 
                              t.getDeadline().toString() + "," + t.getBasePriority());
-                
                 if (t instanceof RecurringTask) {
                     writer.write("," + ((RecurringTask) t).getRecurringIntervalDays());
                 }
@@ -28,13 +31,12 @@ public class FileTaskDAO implements TaskDAO {
         }
     }
 
+    /** Polymorphism: Concrete implementation of loadTasks handling string parsing. */
     @Override
     public List<Task> loadTasks() throws IOException {
         List<Task> tasks = new ArrayList<>();
         File file = new File(filePath);
-        if (!file.exists()) {
-            return tasks; // Return empty list if file doesn't exist
-        }
+        if (!file.exists()) return tasks;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
