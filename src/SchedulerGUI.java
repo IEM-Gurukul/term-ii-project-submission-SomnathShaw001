@@ -89,14 +89,17 @@ public class SchedulerGUI extends JFrame {
         JButton btnAddOneTime = createStyledButton("Add One-Time Task", new Color(46, 204, 113));
         JButton btnAddRecurring = createStyledButton("Add Recurring Task", new Color(155, 89, 182));
         JButton btnViewNext = createStyledButton("View Next Highest Priority Task", new Color(230, 126, 34));
+        JButton btnDelete = createStyledButton("Delete Task", new Color(231, 76, 60));
 
         btnAddOneTime.addActionListener(e -> openAddTaskDialog(false));
         btnAddRecurring.addActionListener(e -> openAddTaskDialog(true));
         btnViewNext.addActionListener(e -> viewNextHighestPriorityTask());
+        btnDelete.addActionListener(e -> deleteSelectedTask());
 
         buttonPanel.add(btnAddOneTime);
         buttonPanel.add(btnAddRecurring);
         buttonPanel.add(btnViewNext);
+        buttonPanel.add(btnDelete);
 
         add(buttonPanel, BorderLayout.SOUTH);
 
@@ -223,5 +226,25 @@ public class SchedulerGUI extends JFrame {
                          "Dynamic Priority: " + String.format("%.2f", nextTask.calculateDynamicPriority());
 
         JOptionPane.showMessageDialog(this, details, "Highest Priority Task", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void deleteSelectedTask() {
+        int selectedRow = taskTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a task from the table to delete.", "No Task Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String taskId = (String) tableModel.getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete task ID: " + taskId + "?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (scheduler.removeTask(taskId)) {
+                JOptionPane.showMessageDialog(this, "Task deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                refreshTable();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to delete task. It might no longer exist.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 }
